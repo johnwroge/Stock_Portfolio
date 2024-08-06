@@ -1,0 +1,58 @@
+# Node.js
+node_modules/
+dist/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.vscode/
+.idea/
+*.log
+package-lock.json
+
+# Vite
+.vite/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+env/
+venv/
+.venv/
+.env
+.env.*
+*.env
+
+
+# macOS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Virtual Environment
+.venv/
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.pyd
+
+# Test coverage
+htmlcov/
+.tox/
+.nox/
+
+# Other
+.vscode/
+*.log
+
+# dotenv
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
