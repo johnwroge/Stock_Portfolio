@@ -25,5 +25,9 @@ Create an env file in the server directory with this information:
 ALPHA_KEY=PWRN1YWDMX74MVP9
 ```
 
+Run the server
+
+`flask --app server run`
+
 
 

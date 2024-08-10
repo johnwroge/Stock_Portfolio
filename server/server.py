@@ -4,6 +4,8 @@ import requests
 from flask import Flask, request, jsonify, current_app
 from dotenv import load_dotenv
 from werkzeug.exceptions import BadRequest
+from utils import parse_stock_csv
+
 
 load_dotenv()
 ALPHA_KEY = os.getenv('ALPHA_KEY')
@@ -25,18 +27,29 @@ def init_db():
 def handle_bad_request(e):
     return jsonify(error=str(e)), 400
 
-@app.route("/v1/stocks/tickers/<string:keywords>")
-def get_tickers(keywords):
-    url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={keywords}&apikey={ALPHA_KEY}"
+# @app.route("/v1/stocks/tickers/<string:keywords>")
+# def get_tickers(keywords):
+#     url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={keywords}&apikey={ALPHA_KEY}"
     
+#     try:
+#         r = requests.get(url)
+#         r.raise_for_status()  
+#         data = r.json()
+#         return jsonify(data), 200
+    
+#     except requests.RequestException as e:
+#         return jsonify({"error": f"Error fetching ticker data: {str(e)}"}), 500
+
+@app.route('/v1/stocks/symbols', methods=['GET'])
+def get_list_of_symbols():
     try:
-        r = requests.get(url)
-        r.raise_for_status()  
-        data = r.json()
-        return jsonify(data), 200
-    
-    except requests.RequestException as e:
-        return jsonify({"error": f"Error fetching ticker data: {str(e)}"}), 500
+        current_directory = os.getcwd()
+        filename = 'listing_status.csv'
+        full_path = os.path.join(current_directory, filename)
+        symbols = parse_stock_csv(full_path)
+        return jsonify({"symbols": symbols}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/v1/stocks/<string:symbol>', methods=['GET'])
