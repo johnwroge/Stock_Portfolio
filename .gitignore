@@ -14,6 +14,9 @@ package-lock.json
 # Vite
 .vite/
 
+#SQL Lite
+stocks.db
+
 # Python
 __pycache__/
 *.py[cod]
