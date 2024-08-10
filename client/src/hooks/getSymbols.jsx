@@ -9,7 +9,7 @@ const getSymbols = async () => {
     }
 
     return response.json();
-    
+
 }
 
-export default getStocks; 
+export default getSymbols; 

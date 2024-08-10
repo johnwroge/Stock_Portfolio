@@ -7,10 +7,11 @@ from werkzeug.exceptions import BadRequest
 from utils import parse_stock_csv
 from flask_cors import CORS
 
-CORS(app)
+
 load_dotenv()
 ALPHA_KEY = os.getenv('ALPHA_KEY')
 app = Flask(__name__)
+CORS(app)
 DATABASE = 'stocks.db'
 
 def get_db():
@@ -76,7 +77,7 @@ def get_stock_info(symbol):
             "change": quote_data.get('09. change'),
             "change_percent": quote_data.get('10. change percent')
         }
-
+        print(formatted_data)
         return jsonify({"stock_info": formatted_data}), 200
     except requests.RequestException as e:
         return jsonify({"error in get_stock_info": f"Error fetching stock data: {str(e)}"}), 500

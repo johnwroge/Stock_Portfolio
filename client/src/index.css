@@ -6,6 +6,12 @@
 }
 
 body {
+  /* background: linear-gradient(to top, #09203f 0%, #537895 100%); */
+  background: radial-gradient(
+    circle at 18.7% 37.8%,
+    rgb(250, 250, 250) 0%,
+    rgb(225, 234, 238) 90%
+  );
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
   color: #333;

@@ -1,0 +1,75 @@
+.app {
+    
+}
+
+.portfolio {
+ background: white;
+  border: solid black 1px;
+  height: 80vh;
+  margin: 100px;
+}
+
+.stock_table {
+  padding: 20px;
+}
+
+.search_bar {
+  padding: 20px;
+}
+
+.search_bar_content {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px; 
+}
+
+.search_bar .autocomplete {
+  flex: 1;
+}
+
+.search_bar .search_display {
+  flex: 2; 
+}
+
+.search_display {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end; 
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.search_display p {
+  margin: 5px 0;
+  display: flex;
+  align-items: flex-end; 
+  border-bottom: 1px dotted black; 
+  padding-bottom: 5px;
+}
+
+.search_display strong {
+  margin-left: auto;
+}
+
+.search_display .column {
+  flex: 1; 
+  padding: 10px;
+  border-radius: 5px; 
+}
+
+.search_display .left {
+  text-align: left;
+  justify-self: unset;
+}
+
+.search_display .right {
+  text-align: left;
+}
+
+.search_display p {
+  margin: 5px 0;
+}
+
+.search_display h4 {
+  margin: 10px 0;
+}
