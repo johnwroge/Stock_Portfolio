@@ -50,7 +50,7 @@ def get_list_of_symbols():
         symbols = parse_stock_csv(full_path)
         return jsonify({"symbols": symbols}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error in get_list_of_symbols": str(e)}), 500
 
 
 @app.route('/v1/stocks/<string:symbol>', methods=['GET'])
@@ -62,7 +62,7 @@ def get_stock_info(symbol):
         data = r.json()
         quote_data = data.get('Global Quote', {})
         if not quote_data:
-            return jsonify({"error": "No data found for the given symbol"}), 404
+            return jsonify({"error in get_stock_info": "No data found for the given symbol"}), 404
         
         formatted_data = {
             "symbol": quote_data.get('01. symbol'),
@@ -79,7 +79,7 @@ def get_stock_info(symbol):
 
         return jsonify({"stock_info": formatted_data}), 200
     except requests.RequestException as e:
-        return jsonify({"error": f"Error fetching stock data: {str(e)}"}), 500
+        return jsonify({"error in get_stock_info": f"Error fetching stock data: {str(e)}"}), 500
 
 
 @app.route('/v1/stocks/<string:symbol>', methods=['POST'])
@@ -106,14 +106,34 @@ def create_or_update_stock(symbol):
         return jsonify({'status': 'success', 'message': message}), 201
     
     except sqlite3.Error as e:
-        logger.error(f"Database error in create_stock: {e}")
+        logger.error(f"Database error in create_or_update_stock: {e}")
         return jsonify({"error": "Database error occurred"}), 500
     except Exception as e:
-        logger.error(f"Unexpected error in create_stock: {e}")
+        logger.error(f"Unexpected error in create_or_update_stock: {e}")
         return jsonify({"error": "An unexpected error occurred"}), 500
 
 
-@app.route('/v1/stocks/', methods=['GET'])
+
+@app.route('/v1/stocks/delete/<int:id>', methods=['DELETE'])
+def delete_stock(id):
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('DELETE FROM stocks WHERE id = ?', [id])
+        if cursor.rowcount == 0:
+            return jsonify({'status': 'not found', 'message': 'No stock found with the given ID'}), 404
+        db.commit()
+        return jsonify({'status': 'success', 'message': f'Stock {id} deleted successfully'}), 200
+    
+    except Exception as e:
+        db.rollback()
+        current_app.logger.error(f"Error deleting stock with ID {id}: {e}")      
+        return jsonify({'status': 'error', 'message': 'An error occurred while deleting the stock'}), 500 
+    finally:
+        if cursor:
+            cursor.close()
+
+@app.route('/v1/stocks', methods=['GET'])
 def get_stocks():
     try:
         db = get_db()
@@ -128,28 +148,6 @@ def get_stocks():
     except Exception as e:
         app.logger.error(f"Unexpected error in get_stocks: {e}")
         return jsonify({"error": "An unexpected error occurred in get_stocks"}), 500
-
-
-from flask import jsonify, current_app
-
-@app.route('/v1/stocks/delete/<int:id>', methods=['DELETE'])
-def delete_stock(id):
-    try:
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute('DELETE FROM stocks WHERE id = ?', [id])
-        if cursor.rowcount == 0:
-            return jsonify({'status': 'not found', 'message': 'No stock found with the given ID'}), 404
-        db.commit()
-        return jsonify({'status': 'success', 'message': 'Stock deleted successfully'}), 200
-    
-    except Exception as e:
-        db.rollback()
-        current_app.logger.error(f"Error deleting stock with ID {id}: {e}")      
-        return jsonify({'status': 'error', 'message': 'An error occurred while deleting the stock'}), 500 
-    finally:
-        if cursor:
-            cursor.close()
 
 if __name__ == '__main__':
    init_db()
