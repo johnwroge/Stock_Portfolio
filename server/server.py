@@ -5,8 +5,9 @@ from flask import Flask, request, jsonify, current_app
 from dotenv import load_dotenv
 from werkzeug.exceptions import BadRequest
 from utils import parse_stock_csv
+from flask_cors import CORS
 
-
+CORS(app)
 load_dotenv()
 ALPHA_KEY = os.getenv('ALPHA_KEY')
 app = Flask(__name__)

@@ -30,4 +30,14 @@ Run the server
 `flask --app server run`
 
 
+## Starting the frontend
+
+`cd client`
+
+`npm install`
+
+
+
+
+
 
