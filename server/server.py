@@ -3,6 +3,7 @@ import sqlite3
 import requests
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
+from werkzeug.exceptions import BadRequest
 
 load_dotenv()
 ALPHA_KEY = os.getenv('ALPHA_KEY')
@@ -10,6 +11,7 @@ ALPHA_KEY = os.getenv('ALPHA_KEY')
 app = Flask(__name__)
 
 DATABASE = 'stocks.db'
+
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
@@ -22,49 +24,91 @@ def init_db():
         with open('schema.sql', mode='r') as f:
             db.executescript(f.read())
 
+@app.errorhandler(BadRequest)
+def handle_bad_request(e):
+    return jsonify(error=str(e)), 400
+
 @app.route("/v1/stocks/tickers/<string:keywords>")
 def get_tickers(keywords):
     url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={keywords}&apikey={ALPHA_KEY}"
-    r = requests.get(url)
-    data = r.json()
-    return f'<p>{data}</p>'
+    try:
+        r = requests.get(url)
+        r.raise_for_status()  
+        data = r.json()
+        return jsonify(data), 200
+    except requests.RequestException as e:
+        return jsonify({"error": f"Error fetching ticker data: {str(e)}"}), 500
 
 @app.route('/v1/stocks/<string:symbol>', methods=['GET'])
 def get_stock_info(symbol):
-    if request.method == 'GET':
-        url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={ALPHA_KEY}'
+    url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={ALPHA_KEY}'
+    try:
         r = requests.get(url)
+        r.raise_for_status() 
         data = r.json()
-        return f'<p>{data}</p>'
+        if 'Global Quote' not in data or not data['Global Quote']:
+            return jsonify({"error": "No data found for the given symbol"}), 404
+        return jsonify(data), 200
+    except requests.RequestException as e:
+        return jsonify({"error": f"Error fetching stock data: {str(e)}"}), 500
+
 
 @app.route('/v1/stocks/<string:symbol>', methods=['POST'])
-def create_stock():
-    data = request.json
-    symbol = data['symbol']
-    price = data['price']
-    number_owned = data['number_owned']
-    market_value = data['market_value']
-    
-    db = get_db()
-    db.execute('INSERT INTO stocks (symbol, price, number_owned, market_value) VALUES (?, ?, ?, ?)',
-               [symbol, price, number_owned, market_value])
-    db.commit()
-    return jsonify({'status': 'success'}), 201
+def create_stock(symbol):
+    try:
+        data = request.json
+        if not all(key in data for key in ['price', 'number_owned', 'market_value']):
+            raise BadRequest("Missing required fields")
+        db = get_db()
+        db.execute('INSERT INTO stocks (symbol, price, number_owned, market_value) VALUES (?, ?, ?, ?)',
+                   [symbol, data['price'], data['number_owned'], data['market_value']])
+        db.commit()
+        return jsonify({'status': 'success', 'message': 'Stock created successfully'}), 201
+    except sqlite3.Error as e:
+        logger.error(f"Database error in create_stock: {e}")
+        return jsonify({"error": "Database error occurred"}), 500
+    except Exception as e:
+        logger.error(f"Unexpected error in create_stock: {e}")
+        return jsonify({"error": "An unexpected error occurred"}), 500
+
 
 @app.route('/v1/stocks/', methods=['GET'])
 def get_stocks():
-    db = get_db()
-    cur = db.execute('SELECT * FROM stocks')
-    stocks = cur.fetchall()
-    return jsonify([dict(row) for row in stocks])
+    try:
+        db = get_db()
+        cur = db.execute('SELECT * FROM stocks')
+        stocks = cur.fetchall()    
+        if not stocks:
+            return jsonify({"message": "No stocks found", "stocks": []}), 200 
+        return jsonify({"stocks": [dict(row) for row in stocks]}), 200
+    except sqlite3.Error as e:
+        app.logger.error(f"Database error in get_stocks: {e}")
+        return jsonify({"error": "Database error occurred"}), 500
+    except Exception as e:
+        app.logger.error(f"Unexpected error in get_stocks: {e}")
+        return jsonify({"error": "An unexpected error occurred in get_stocks"}), 500
+
+
+from flask import jsonify, current_app
 
 @app.route('/v1/stocks/delete/<int:id>', methods=['DELETE'])
 def delete_stock(id):
-    db = get_db()
-    db.execute('DELETE FROM stocks WHERE id = ?', [id])
-    db.commit()
-    return jsonify({'status': 'success'}), 200
-
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('DELETE FROM stocks WHERE id = ?', [id])
+        if cursor.rowcount == 0:
+            return jsonify({'status': 'not found', 'message': 'No stock found with the given ID'}), 404
+        db.commit()
+        return jsonify({'status': 'success', 'message': 'Stock deleted successfully'}), 200
+    
+    except Exception as e:
+        db.rollback()
+        current_app.logger.error(f"Error deleting stock with ID {id}: {e}")      
+        return jsonify({'status': 'error', 'message': 'An error occurred while deleting the stock'}), 500 
+    finally:
+        if cursor:
+            cursor.close()
 
 if __name__ == '__main__':
    init_db()
