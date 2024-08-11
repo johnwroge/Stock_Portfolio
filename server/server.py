@@ -1,6 +1,8 @@
 import os
 import sqlite3
 import requests
+import sys
+import logging
 from flask import Flask, request, jsonify, current_app
 from dotenv import load_dotenv
 from werkzeug.exceptions import BadRequest
@@ -8,11 +10,14 @@ from utils import parse_stock_csv
 from flask_cors import CORS
 
 
+
 load_dotenv()
 ALPHA_KEY = os.getenv('ALPHA_KEY')
 app = Flask(__name__)
 CORS(app)
 DATABASE = 'stocks.db'
+logging.basicConfig(filename='app.log', level=logging.ERROR)
+logger = logging.getLogger(__name__)
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
@@ -23,24 +28,12 @@ def init_db():
     with app.app_context():
         db = get_db()
         with open('schema.sql', mode='r') as f:
-            db.executescript(f.read())
+            db.execute(f.read())
 
 @app.errorhandler(BadRequest)
 def handle_bad_request(e):
     return jsonify(error=str(e)), 400
 
-# @app.route("/v1/stocks/tickers/<string:keywords>")
-# def get_tickers(keywords):
-#     url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={keywords}&apikey={ALPHA_KEY}"
-    
-#     try:
-#         r = requests.get(url)
-#         r.raise_for_status()  
-#         data = r.json()
-#         return jsonify(data), 200
-    
-#     except requests.RequestException as e:
-#         return jsonify({"error": f"Error fetching ticker data: {str(e)}"}), 500
 
 @app.route('/v1/stocks/symbols', methods=['GET'])
 def get_list_of_symbols():
@@ -57,11 +50,13 @@ def get_list_of_symbols():
 @app.route('/v1/stocks/<string:symbol>', methods=['GET'])
 def get_stock_info(symbol):
     url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={ALPHA_KEY}'
+    
     try:
         r = requests.get(url)
-        r.raise_for_status()  # Raises an HTTPError for bad responses
+        r.raise_for_status() 
         data = r.json()
         quote_data = data.get('Global Quote', {})
+        
         if not quote_data:
             return jsonify({"error in get_stock_info": "No data found for the given symbol"}), 404
         
@@ -77,7 +72,7 @@ def get_stock_info(symbol):
             "change": quote_data.get('09. change'),
             "change_percent": quote_data.get('10. change percent')
         }
-        print(formatted_data)
+        
         return jsonify({"stock_info": formatted_data}), 200
     except requests.RequestException as e:
         return jsonify({"error in get_stock_info": f"Error fetching stock data: {str(e)}"}), 500
@@ -85,6 +80,7 @@ def get_stock_info(symbol):
 
 @app.route('/v1/stocks/<string:symbol>', methods=['POST'])
 def create_or_update_stock(symbol):
+    
     try:
         data = request.json
         if not all(key in data for key in ['price', 'number_owned', 'market_value']):
@@ -92,13 +88,15 @@ def create_or_update_stock(symbol):
         db = get_db()
         cur = db.execute('SELECT number_owned, market_value FROM stocks WHERE symbol = ?', [symbol])
         existing_stock = cur.fetchone()
-
+        # print(dict(existing_stock))
         if existing_stock:
             new_number_owned = existing_stock['number_owned'] + data['number_owned']
-            new_market_value = existing_stock['market_value'] + data['market_value']
+           
+            new_market_value = float(existing_stock['market_value']) + float(data['market_value'])
             db.execute('UPDATE stocks SET number_owned = ?, market_value = ? WHERE symbol = ?',
                        [new_number_owned, new_market_value, symbol])
             message = 'Stock updated successfully'
+            # print(existing_stock['number_owned'], data['number_owned'])
         else:
             db.execute('INSERT INTO stocks (symbol, price, number_owned, market_value) VALUES (?, ?, ?, ?)',
                        [symbol, data['price'], data['number_owned'], data['market_value']])
@@ -150,6 +148,11 @@ def get_stocks():
         app.logger.error(f"Unexpected error in get_stocks: {e}")
         return jsonify({"error": "An unexpected error occurred in get_stocks"}), 500
 
+# print('This is error output', file=sys.stderr)
+# print('This is standard output', file=sys.stdout)
+# print('enter getJSONReuslt', flush=True)
+
 if __name__ == '__main__':
    init_db()
-   app.run()
+   app.run(debug=True)
+   

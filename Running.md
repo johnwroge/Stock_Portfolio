@@ -25,16 +25,22 @@ Create an env file in the server directory with this information:
 ALPHA_KEY=PWRN1YWDMX74MVP9
 ```
 
-Run the server
+If this is the first time running the backend, the sqlite database needs to be initialized. Run the server with. 
 
-`flask --app server run`
+`python3 server.py` 
+
+If you choose to run the server with flask `flask --app server run`, the database will not
+be initialized and will lead to errors. However, after the database is initialized the app can be started with this command. 
 
 
 ## Starting the frontend
 
+
 `cd client`
 
 `npm install`
+
+`npm run dev`
 
 
 

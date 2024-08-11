@@ -1,4 +1,4 @@
-export const top_500_stocks = {
+export const top_stocks = {
   "AAPL": "Apple Inc.",
   "ABT": "Abbott Laboratories",
   "ACN": "Accenture plc",
@@ -357,3 +357,9 @@ export const top_500_stocks = {
   "ZION": "Zions Bancorporation",
   "ZTS": "Zoetis Inc."
 };
+
+
+export const options = Object.entries(top_stocks).map(([symbol, name]) => ({
+  label: `${symbol} - ${name}`,
+  value: symbol,
+}));
