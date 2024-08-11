@@ -8,12 +8,13 @@ import StockDisplay from "./StockDisplay";
 import getStockPrice from "../hooks/getStockPrice";
 import createStocks from "../hooks/createStocks";
 
-const SearchBar = () => {
+const SearchBar = ({ setStocks, stocks }) => {
   const [symbol, setSymbol] = useState("");
   const [stockPrice, setStockPrice] = useState(null);
   const [quantity, setQuantity] = useState(0);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const MAX_STOCKS = 5;
 
   const handlePriceSearchSubmit = async (e) => {
     e.preventDefault();
@@ -33,25 +34,58 @@ const SearchBar = () => {
 
   const handleStockBuy = async (e) => {
     e.preventDefault();
-    let { price, symbol } = stockPrice;
-
+    let { price, symbol, previous_close } = stockPrice;
     const value = parseFloat(price) * quantity;
     const change_qty = parseFloat(quantity);
     price = parseFloat(price);
+    previous_close = parseFloat(previous_close);
     const body = {
       price: price > 0 ? price : 0,
       number_owned: change_qty,
       market_value: value,
+      previous_close: previous_close,
     };
     try {
+      
+      if (stocks.length >=5 && stocks.findIndex((stock) => stock.symbol === symbol) === -1){
+        alert(`You can't add more than ${MAX_STOCKS} stocks. Remove a stock and try again!`);
+        return; 
+      }
       const response = await createStocks(symbol, body);
-      console.log("Stock buy successful:", response);
+      if (!response || !response.stock) {
+        throw new Error("Invalid response from server");
+      }
+
+      setStocks((prevStocks) => {
+        const existingStockIndex = prevStocks.findIndex(
+          (stock) => stock.symbol === symbol
+        );
+        if (existingStockIndex == -1 && prevStocks.length >= 5) {
+          alert(`You can't add more than ${MAX_STOCKS} stocks. Remove a stock and try again!`);
+          return prevStocks;
+        }
+        else if (existingStockIndex !== -1) {
+          const updatedStocks = [...prevStocks];
+          updatedStocks[existingStockIndex] = {
+            ...updatedStocks[existingStockIndex],
+            ...response.stock,
+          };
+          return updatedStocks;
+        } else {
+          alert(`Successfully added ${quantity} shares of ${symbol}`);
+          return [...prevStocks, response.stock];
+        }
+      });
+
+      
       setError(null);
       setQuantity(0);
+      setStockPrice(null);
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
+      setSymbol(null);
     }
   };
 
@@ -60,17 +94,18 @@ const SearchBar = () => {
       className="search_bar"
       style={{ display: "flex", flexDirection: "column", gap: "10px" }}
     >
-      <form
-        onSubmit={handlePriceSearchSubmit}
-        // style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-      >
+      <form onSubmit={handlePriceSearchSubmit}>
         <Stack direction="row" spacing={2}>
           <Autocomplete
             freeSolo
             disablePortal
             id="combo-box-demo"
             options={options}
-            value={options.find((option) => option.value === symbol) || null}
+            value={
+              symbol
+                ? options.find((option) => option.value === symbol) || null
+                : null
+            }
             onChange={(event, newValue) => {
               setSymbol(newValue?.value || "");
             }}
@@ -107,7 +142,7 @@ const SearchBar = () => {
                 sx={{ width: 300 }}
               />
               <Button type="submit" variant="contained" color="primary">
-                Buy or Track
+                Buy/Track
               </Button>
             </Stack>
           </form>

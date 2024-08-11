@@ -1,52 +1,83 @@
-import React, { useEffect, useState } from "react";
-import createStocks from "../hooks/createStocks";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import Button from "@mui/material/Button";
-import { Stack, CircularProgress } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import StockRow from "./StockRow";
-import { options } from "../utils/stocks";
+import getStockPrice from "../hooks/getStockPrice";
 
-function StockTable({ stocks, onDeleteStock }) {
+function StockTable({ stocks, onDeleteStock, setStocks }) {
   const [symbol, setSymbol] = useState("");
   const [stockPrice, setStockPrice] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // *  Symbol
-  // *  Last Trade Price
-  // *  Number of shares owned
-  // *  Market value of stake (Trade price times number of shares)
+  useEffect(() => {
+    const updateStocks = async () => {
+      try {
+        const updatedStocksData = await Promise.all(
+          stocks.map((stock) => getStockPrice(stock.symbol))
+        );
+        console.log(updatedStocksData);
+        setStocks(prevStocks =>
+          prevStocks.map((stock, index) => ({
+            ...stock,
+            ...updatedStocksData[index].stock_info
+          }))
+        );
+        setError(null);
+      } catch (error) {
+        console.error("Error updating stocks:", error);
+        setError("Failed to update stock prices. Please try again later.");
+      }
+    };
+    const intervalId = setInterval(updateStocks, 18749880);
+    return () => clearInterval(intervalId);
+  }, []);
 
-const display = stocks.map((stock, idx) => (
-  <ul style={{display: 'flex', flexDirection: 'row', gap: '20px'}} key = {idx}> 
-    <p> {stock.id} </p>
-    <p> {stock.market_value} </p>
-    <p> {stock.number_owned} </p>
-    <p> {stock.symbol} </p>
-    <p> {stock.price}  </p>
-  </ul>
-))
-
-console.log(stocks)
   return (
     <div className="stock_table">
-      <div className="search_bar">
-      {display}
-        {loading ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "20px",
-            }}
-          >
-            <CircularProgress />
-          </div>
-        ) : (
-          <></>
-        )}
-      </div>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="stock table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Symbol</TableCell>
+              <TableCell>Last Trade Price</TableCell>
+              <TableCell>Number of Shares Owned</TableCell>
+              <TableCell>Market Value of Stake</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {stocks.map((stock) => (
+              <StockRow
+                key={stock.id}
+                stock={stock}
+                onDeleteStock={onDeleteStock}
+                isRising={stock.price > stock.previous_close}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {loading && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      )}
     </div>
   );
 }

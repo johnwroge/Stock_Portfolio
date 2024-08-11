@@ -5,5 +5,6 @@ CREATE TABLE IF NOT EXISTS stocks (
     symbol TEXT NOT NULL,
     price REAL NOT NULL,
     number_owned REAL NOT NULL,
-    market_value REAL NOT NULL
+    market_value REAL NOT NULL,
+    previous_close REAL NOT NULL
 );

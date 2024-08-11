@@ -16,8 +16,12 @@ ALPHA_KEY = os.getenv('ALPHA_KEY')
 app = Flask(__name__)
 CORS(app)
 DATABASE = 'stocks.db'
-logging.basicConfig(filename='app.log', level=logging.ERROR)
+
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
+# To record logging 
+# logging.basicConfig(filename='app.log', level=logging.ERROR)
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
@@ -80,34 +84,47 @@ def get_stock_info(symbol):
 
 @app.route('/v1/stocks/<string:symbol>', methods=['POST'])
 def create_or_update_stock(symbol):
-    
     try:
         data = request.json
-        if not all(key in data for key in ['price', 'number_owned', 'market_value']):
+        if not all(key in data for key in ['price', 'number_owned', 'market_value', 'previous_close']):
             raise BadRequest("Missing required fields") 
         db = get_db()
-        cur = db.execute('SELECT number_owned, market_value FROM stocks WHERE symbol = ?', [symbol])
+        cur = db.execute('SELECT number_owned, market_value, previous_close FROM stocks WHERE symbol = ?', [symbol])
         existing_stock = cur.fetchone()
-        # print(dict(existing_stock))
+
         if existing_stock:
             new_number_owned = existing_stock['number_owned'] + data['number_owned']
-           
             new_market_value = float(existing_stock['market_value']) + float(data['market_value'])
-            db.execute('UPDATE stocks SET number_owned = ?, market_value = ? WHERE symbol = ?',
-                       [new_number_owned, new_market_value, symbol])
+            db.execute('UPDATE stocks SET number_owned = ?, market_value = ?, price = ?, previous_close = ? WHERE symbol = ?',
+                       [new_number_owned, new_market_value, data['price'], data['previous_close'], symbol])
             message = 'Stock updated successfully'
-            # print(existing_stock['number_owned'], data['number_owned'])
         else:
-            db.execute('INSERT INTO stocks (symbol, price, number_owned, market_value) VALUES (?, ?, ?, ?)',
-                       [symbol, data['price'], data['number_owned'], data['market_value']])
+            db.execute('INSERT INTO stocks (symbol, price, number_owned, market_value, previous_close) VALUES (?, ?, ?, ?, ?)',
+                       [symbol, data['price'], data['number_owned'], data['market_value'], data['previous_close']])
             message = 'Stock created successfully'
         db.commit()
-        return jsonify({'status': 'success', 'message': message}), 201
+
+        cur = db.execute('SELECT * FROM stocks WHERE symbol = ?', [symbol])
+        updated_stock = cur.fetchone()
+
+        return jsonify({
+            'status': 'success',
+            'message': message,
+            'stock': {
+                'id': updated_stock['id'],
+                'symbol': updated_stock['symbol'],
+                'price': updated_stock['price'],
+                'number_owned': updated_stock['number_owned'],
+                'market_value': updated_stock['market_value'],
+                'previous_close': updated_stock['previous_close']
+            }
+        }), 201
     
     except sqlite3.Error as e:
         logger.error(f"Database error in create_or_update_stock: {e}")
         return jsonify({"error": "Database error occurred"}), 500
     except Exception as e:
+        print('in catch 3')
         logger.error(f"Unexpected error in create_or_update_stock: {e}")
         return jsonify({"error": "An unexpected error occurred"}), 500
 
@@ -148,9 +165,7 @@ def get_stocks():
         app.logger.error(f"Unexpected error in get_stocks: {e}")
         return jsonify({"error": "An unexpected error occurred in get_stocks"}), 500
 
-# print('This is error output', file=sys.stderr)
-# print('This is standard output', file=sys.stdout)
-# print('enter getJSONReuslt', flush=True)
+
 
 if __name__ == '__main__':
    init_db()

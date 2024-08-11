@@ -1,6 +1,5 @@
 const createStocks = async (symbol, stockData) => {
 
-  console.log('create stocks', symbol, stockData)
   const response = await fetch(`http://localhost:5000/v1/stocks/${symbol}`, {
     method: "POST",
     headers: {

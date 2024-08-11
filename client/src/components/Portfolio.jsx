@@ -18,11 +18,13 @@ function Portfolio() {
     };
     fetchStocks();
   }, []);
+  
 
-  const handleDeleteStock = async (id) => {
+  const handleDeleteStock = async (id, symbol) => {
     try {
-      await deleteStocks(id);
+      const result = await deleteStocks(id, symbol);
       setStocks((prevStocks) => prevStocks.filter((stock) => stock.id !== id));
+      alert(`${symbol} successfully removed from portfolio`);
     } catch (error) {
       console.error("Error deleting stock:", error);
     }
@@ -31,13 +33,13 @@ function Portfolio() {
   return (
     <>
       <div className="portfolio">
-        <SearchBar onCreateStock={setStocks} />
+        <SearchBar setStocks={setStocks} stocks={stocks} />
       </div>
       <div className="portfolio">
         <StockTable
           stocks={stocks}
-          onCreateStock={setStocks}
           onDeleteStock={handleDeleteStock}
+          setStocks={setStocks}
           className="search_bar"
         />
       </div>

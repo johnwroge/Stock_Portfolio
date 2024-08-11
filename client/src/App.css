@@ -6,6 +6,10 @@
   margin: 10px 150px 0px 150px;
 }
 
+.nav {
+  margin-left: 4rem; 
+}
+
 .stock_table {
   padding: 20px;
   min-height: 400px;
