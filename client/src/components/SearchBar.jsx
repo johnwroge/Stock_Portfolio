@@ -4,8 +4,9 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
 import { Stack, CircularProgress } from "@mui/material";
 import { top_500_stocks } from "../utils/stocks";
-import SearchDisplay from "./StockDisplay";
+import StockDisplay from "./StockDisplay";
 import getStockPrice from "../hooks/getStockPrice";
+import createStocks from "../hooks/createStocks";
 
 const SearchBar = () => {
   const [symbol, setSymbol] = useState("");
@@ -19,7 +20,7 @@ const SearchBar = () => {
     value: symbol,
   }));
 
-  const handleSubmit = async (e) => {
+  const handlePriceSearchSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -34,10 +35,32 @@ const SearchBar = () => {
     }
   };
 
+  const handleStockBuy = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const {price, symbol } = stockPrice;
+      const value = parseFloat(price) * quantity;
+   
+      const body = {
+        price: price,
+        number_owned: symbol,
+        market_value: value,
+      };
+      
+      const data = await createStocks(symbol, body);
+      setError(null);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="search_bar">
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handlePriceSearchSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "10px" }}
       >
         <Stack direction="row" spacing={2}>
@@ -55,18 +78,9 @@ const SearchBar = () => {
               <TextField {...params} label="Stock Ticker" />
             )}
           />
-          {/* <TextField
-            type="number"
-            label="Quantity"
-            value={quantity}
-            InputProps={{
-                inputProps: { min: 0 }
-              }}
-            onChange={(e) => setQuantity(e.target.value)}
-            sx={{ width: 300 }}
-          /> */}
+
           <Button type="submit" variant="contained" color="primary">
-            Submit
+            Search
           </Button>
         </Stack>
       </form>
@@ -82,18 +96,44 @@ const SearchBar = () => {
         </div>
       ) : (
         stockPrice && (
-          <SearchDisplay
-            symbol={stockPrice.symbol}
-            open={stockPrice.open}
-            high={stockPrice.high}
-            low={stockPrice.low}
-            volume={stockPrice.volume}
-            price={stockPrice.price}
-            isRising={stockPrice.price > stockPrice.previous_close}
-            previous={stockPrice.previous_close}
-            change={stockPrice.change}
-            change_percent={stockPrice.change_percent}
-          />
+          <> 
+            <StockDisplay
+              symbol={stockPrice.symbol}
+              open={stockPrice.open}
+              high={stockPrice.high}
+              low={stockPrice.low}
+              volume={stockPrice.volume}
+              price={stockPrice.price}
+              isRising={stockPrice.price > stockPrice.previous_close}
+              previous={stockPrice.previous_close}
+              change={stockPrice.change}
+              change_percent={stockPrice.change_percent}
+            />
+            <form
+            onSubmit={handleStockBuy}
+            style={{ display: "flex", gap: "10px", flexDirection: "column" }}
+          >
+            <Stack direction="row" spacing={2}>
+              <TextField
+                type="number"
+                label="Optional Qty"
+                value={quantity}
+                InputProps={{
+                  inputProps: { min: 0 },
+                }}
+                onChange={(e) => setQuantity(e.target.value)}
+                sx={{ width: 300}}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+              >
+                Buy or Track
+              </Button>
+            </Stack>
+          </form>
+          </>
         )
       )}
     </div>

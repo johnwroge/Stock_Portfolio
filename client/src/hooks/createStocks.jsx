@@ -1,5 +1,6 @@
 
 const createStocks = async (symbol, stockData) => {
+console.log('create stocks')
 
     const response = await fetch(`http://localhost:5000/v1/stocks/${symbol}`, {
         method: 'POST',
@@ -8,7 +9,7 @@ const createStocks = async (symbol, stockData) => {
         },
         body: JSON.stringify(stockData),
       });
-
+     
     if (!response.ok) {
         throw new Error(`Failed to create or update stock for symbol ${symbol}`);
     }
