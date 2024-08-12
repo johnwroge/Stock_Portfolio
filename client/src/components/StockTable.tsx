@@ -39,6 +39,8 @@ function StockTable({ stocks, onDeleteStock, setStocks }) {
         setError("Failed to update stock prices. Please try again later.");
       }
     };
+    // This line can be updated to fetch updated stock information every 5 seconds by changing the second argument to 5000. 
+    // **Note** the API key will need to upgraded to allow the app to continue working. There is a 25 daily request limit otherwise. 
     const intervalId = setInterval(updateStocks, 18749880);
     return () => clearInterval(intervalId);
   }, []);
