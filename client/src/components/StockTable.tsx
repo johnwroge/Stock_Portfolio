@@ -9,29 +9,31 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import StockRow from "./StockRow";
-import getStockPrice from "../hooks/getStockPrice";
+import StockRow from "./StockRow.jsx";
+import getStockPrice from "../hooks/getStockPrice.tsx";
 
 function StockTable({ stocks, onDeleteStock, setStocks }) {
-  const [symbol, setSymbol] = useState("");
-  const [stockPrice, setStockPrice] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  // const [symbol, setSymbol] = useState<string>("");
+  // const [stockPrice, setStockPrice] = useState(null);
+  const [error, setError] = useState<null | string>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const updateStocks = async () => {
       try {
+        setLoading(true);
         const updatedStocksData = await Promise.all(
           stocks.map((stock) => getStockPrice(stock.symbol))
         );
         console.log(updatedStocksData);
-        setStocks(prevStocks =>
+        setStocks((prevStocks) =>
           prevStocks.map((stock, index) => ({
             ...stock,
-            ...updatedStocksData[index].stock_info
+            ...updatedStocksData[index].stock_info,
           }))
         );
         setError(null);
+        setLoading(false);
       } catch (error) {
         console.error("Error updating stocks:", error);
         setError("Failed to update stock prices. Please try again later.");

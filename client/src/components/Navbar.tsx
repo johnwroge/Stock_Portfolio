@@ -1,6 +1,6 @@
 import React from 'react'
 
-function Navbar() {
+const Navbar: React.FC = () => {
   return (
     <h1 className='nav'>Manrico's Stock Portfolio </h1>
   )

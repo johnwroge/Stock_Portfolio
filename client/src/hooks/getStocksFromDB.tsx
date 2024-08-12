@@ -1,5 +1,6 @@
+import { Stock } from '../types/types'; 
 
-const getStocksFromDB = async () => {
+const getStocksFromDB = async (): Promise<{ stocks: Stock[] }> => {
 
     const response = await fetch(`http://localhost:5000/v1/stocks`);
 

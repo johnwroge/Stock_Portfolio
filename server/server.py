@@ -39,18 +39,6 @@ def handle_bad_request(e):
     return jsonify(error=str(e)), 400
 
 
-@app.route('/v1/stocks/symbols', methods=['GET'])
-def get_list_of_symbols():
-    try:
-        current_directory = os.getcwd()
-        filename = 'listing_status.csv'
-        full_path = os.path.join(current_directory, filename)
-        symbols = parse_stock_csv(full_path)
-        return jsonify({"symbols": symbols}), 200
-    except Exception as e:
-        return jsonify({"error in get_list_of_symbols": str(e)}), 500
-
-
 @app.route('/v1/stocks/<string:symbol>', methods=['GET'])
 def get_stock_info(symbol):
     url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={ALPHA_KEY}'

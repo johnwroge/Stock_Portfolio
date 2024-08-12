@@ -3,10 +3,10 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
 import { Stack, CircularProgress } from "@mui/material";
-import { options } from "../utils/stocks";
-import StockDisplay from "./StockDisplay";
-import getStockPrice from "../hooks/getStockPrice";
-import createStocks from "../hooks/createStocks";
+import { options } from "../utils/stocks.js";
+import StockDisplay from "./StockDisplay.jsx";
+import getStockPrice from "../hooks/getStockPrice.tsx";
+import createStocks from "../hooks/createStocks.tsx";
 
 const SearchBar = ({ setStocks, stocks }) => {
   const [symbol, setSymbol] = useState("");
@@ -21,6 +21,7 @@ const SearchBar = ({ setStocks, stocks }) => {
     setLoading(true);
     try {
       const data = await getStockPrice(symbol);
+      console.log(data);
       setStockPrice(data.stock_info);
       setError(null);
     } catch (error) {
@@ -46,10 +47,14 @@ const SearchBar = ({ setStocks, stocks }) => {
       previous_close: previous_close,
     };
     try {
-      
-      if (stocks.length >=5 && stocks.findIndex((stock) => stock.symbol === symbol) === -1){
-        alert(`You can't add more than ${MAX_STOCKS} stocks. Remove a stock and try again!`);
-        return; 
+      if (
+        stocks.length >= 5 &&
+        stocks.findIndex((stock) => stock.symbol === symbol) === -1
+      ) {
+        alert(
+          `You can't add more than ${MAX_STOCKS} stocks. Remove a stock and try again!`
+        );
+        return;
       }
       const response = await createStocks(symbol, body);
       if (!response || !response.stock) {
@@ -61,10 +66,11 @@ const SearchBar = ({ setStocks, stocks }) => {
           (stock) => stock.symbol === symbol
         );
         if (existingStockIndex == -1 && prevStocks.length >= 5) {
-          alert(`You can't add more than ${MAX_STOCKS} stocks. Remove a stock and try again!`);
+          alert(
+            `You can't add more than ${MAX_STOCKS} stocks. Remove a stock and try again!`
+          );
           return prevStocks;
-        }
-        else if (existingStockIndex !== -1) {
+        } else if (existingStockIndex !== -1) {
           const updatedStocks = [...prevStocks];
           updatedStocks[existingStockIndex] = {
             ...updatedStocks[existingStockIndex],
@@ -77,7 +83,6 @@ const SearchBar = ({ setStocks, stocks }) => {
         }
       });
 
-      
       setError(null);
       setQuantity(0);
       setStockPrice(null);

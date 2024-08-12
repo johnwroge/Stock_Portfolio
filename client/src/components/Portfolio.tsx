@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
-import SearchBar from "./SearchBar";
-import StockTable from "./StockTable";
-import getStocksFromDB from "../hooks/getStocksFromDB";
-import deleteStocks from "../hooks/deleteStocks";
+import { useState, useEffect } from "react";
+import SearchBar from "./SearchBar.tsx";
+import StockTable from "./StockTable.js";
+import getStocksFromDB from "../hooks/getStocksFromDB.tsx";
+import deleteStocks from "../hooks/deleteStocks.js";
+import { Stock } from "../types/types.ts";
 
 function Portfolio() {
-  const [stocks, setStocks] = useState([]);
+  const [stocks, setStocks] = useState<Stock[]>([]);
 
   useEffect(() => {
     const fetchStocks = async () => {
@@ -18,10 +19,10 @@ function Portfolio() {
     };
     fetchStocks();
   }, []);
-  
 
-  const handleDeleteStock = async (id, symbol) => {
+  const handleDeleteStock = async (id: number, symbol: string) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const result = await deleteStocks(id, symbol);
       setStocks((prevStocks) => prevStocks.filter((stock) => stock.id !== id));
       alert(`${symbol} successfully removed from portfolio`);
@@ -40,6 +41,7 @@ function Portfolio() {
           stocks={stocks}
           onDeleteStock={handleDeleteStock}
           setStocks={setStocks}
+          // @ts-ignore
           className="search_bar"
         />
       </div>
