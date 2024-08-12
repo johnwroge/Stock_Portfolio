@@ -33,7 +33,7 @@ function Portfolio() {
 
   return (
     <>
-      <div className="portfolio">
+      <div className="portfolio" data-testid="portfolio">
         <SearchBar setStocks={setStocks} stocks={stocks} />
       </div>
       <div className="portfolio">

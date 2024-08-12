@@ -31,6 +31,10 @@ venv/
 .env
 .env.*
 *.env
+pytest/
+pytest-flask/
+*.pyc
+*.pyo
 
 
 # macOS
