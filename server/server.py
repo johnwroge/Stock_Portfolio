@@ -112,7 +112,6 @@ def create_or_update_stock(symbol):
         logger.error(f"Database error in create_or_update_stock: {e}")
         return jsonify({"error": "Database error occurred"}), 500
     except Exception as e:
-        print('in catch 3')
         logger.error(f"Unexpected error in create_or_update_stock: {e}")
         return jsonify({"error": "An unexpected error occurred"}), 500
 

@@ -25,7 +25,6 @@ function StockTable({ stocks, onDeleteStock, setStocks }) {
         const updatedStocksData = await Promise.all(
           stocks.map((stock) => getStockPrice(stock.symbol))
         );
-        console.log(updatedStocksData);
         setStocks((prevStocks) =>
           prevStocks.map((stock, index) => ({
             ...stock,

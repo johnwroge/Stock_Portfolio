@@ -21,7 +21,6 @@ const SearchBar = ({ setStocks, stocks }) => {
     setLoading(true);
     try {
       const data = await getStockPrice(symbol);
-      console.log(data);
       setStockPrice(data.stock_info);
       setError(null);
     } catch (error) {
