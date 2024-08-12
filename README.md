@@ -12,7 +12,7 @@ Most of the requirements in the initial readme were met, except for updating.
 - [ ] Updating portfolio data every 5 seconds (Last Trade Price, Market Value)
 - [x] (Bonus) Green up, Red down arrow if price of stock went up or down since last update
 
-The Alpha Vantage API limits the number of requests that can be made in one day to 25 for the free API key. As a result, making requests every 5 seconds to fetch updated price data was not feasible, however, the premium api key can be purchased and the stock table component can be updated to make requests every 5000 milliseconds to fulfill this requirement. 
+The Alpha Vantage API limits the number of requests that can be made in one day to 25 for the free API key. As a result, making requests every 5 seconds to fetch updated price data was not feasible, however, the premium API key can be purchased and the stock table component can be updated to make requests every 5000 milliseconds to fulfill this requirement. 
 
 ## Testing
 
