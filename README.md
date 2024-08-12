@@ -14,8 +14,6 @@ Most of the requirements in the initial readme were met, except for updating.
 
 The Alpha Vantage API limits the number of requests that can be made in one day to 25 for the free API key. As a result, making requests every 5 seconds to fetch updated price data was not feasible, however, the premium API key can be purchased and the stock table component can be updated to make requests every 5000 milliseconds to fulfill this requirement. 
 
-## Testing
-
 
 ## Future Considerations
 
@@ -77,7 +75,24 @@ after the database is created .
 4. Visit http://localhost:5173/ to use the application.
 
 
+## Testing
 
+Tests were written with Vitest and React Testing Library for the frontend and Pytest on the backend.
+
+Ensure you have a virtual environment and dependencies for the server by following the setup instructions above. Additionally installing dependencies for the frontend are also required.  
+
+### Frontend Tests:
+
+`cd client`
+
+`npm run test`
+
+
+### Backend Tests
+
+`cd server`
+
+`pytest`
 
 
 
