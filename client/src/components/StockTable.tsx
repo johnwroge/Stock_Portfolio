@@ -9,20 +9,29 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import StockRow from "./StockRow.jsx";
-import getStockPrice from "../hooks/getStockPrice.tsx";
+import StockRow from "./StockRow";
+import getStockPrice from "../hooks/getStockPrice";
+import { Stock, StockInfo } from "../types/types.ts";
 
-function StockTable({ stocks, onDeleteStock, setStocks }) {
-  // const [symbol, setSymbol] = useState<string>("");
-  // const [stockPrice, setStockPrice] = useState(null);
-  const [error, setError] = useState<null | string>(null);
+interface StockTableProps {
+  stocks: Stock[];
+  onDeleteStock: (id: number, symbol: string) => void;
+  setStocks: React.Dispatch<React.SetStateAction<Stock[]>>;
+}
+
+const StockTable: React.FC<StockTableProps> = ({
+  stocks,
+  onDeleteStock,
+  setStocks,
+}) => {
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const updateStocks = async () => {
       try {
         setLoading(true);
-        const updatedStocksData = await Promise.all(
+        const updatedStocksData: StockInfo[] = await Promise.all(
           stocks.map((stock) => getStockPrice(stock.symbol))
         );
         setStocks((prevStocks) =>
@@ -38,11 +47,10 @@ function StockTable({ stocks, onDeleteStock, setStocks }) {
         setError("Failed to update stock prices. Please try again later.");
       }
     };
-    // This line can be updated to fetch updated stock information every 5 seconds by changing the second argument to 5000. 
-    // **Note** the API key will need to upgraded to allow the app to continue working. There is a 25 daily request limit otherwise. 
+
     const intervalId = setInterval(updateStocks, 18749880);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [setStocks, stocks]);
 
   return (
     <div className="stock_table">
@@ -83,6 +91,6 @@ function StockTable({ stocks, onDeleteStock, setStocks }) {
       )}
     </div>
   );
-}
+};
 
 export default StockTable;

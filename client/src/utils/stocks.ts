@@ -1,4 +1,6 @@
-export const top_stocks = {
+import { TopStocks } from "../types/types";
+
+export const top_stocks: TopStocks = {
   "AAPL": "Apple Inc.",
   "ABT": "Abbott Laboratories",
   "ACN": "Accenture plc",
