@@ -21,7 +21,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const data = await getStockPrice(symbol);
+      const data = await getStockPrice(symbol); 
       setStockPrice(data.stock_info);
       setError(null);
     } catch (error) {
