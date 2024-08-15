@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
-import { Stack, CircularProgress } from "@mui/material";
+import { Stack, CircularProgress, Alert } from "@mui/material";
 import { options } from "../utils/stocks.ts";
 import StockDisplay from "./StockDisplay";
 import getStockPrice from "../hooks/getStockPrice";
@@ -23,6 +23,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
 
   const handlePriceSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!symbol) {
+      setError("Please select a stock symbol before searching.");
+      return;
+    }
+
     setLoading(true);
     try {
       const data = await getStockPrice(symbol);
@@ -133,6 +139,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
           </Button>
         </Stack>
       </form>
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
       {stockPrice && (
         <div>
           <form
