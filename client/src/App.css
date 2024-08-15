@@ -1,3 +1,5 @@
+/* Portfolio */
+
 .portfolio {
   background: white;
   border-radius: 1rem;
@@ -5,7 +7,6 @@
   min-height: 300px;
   margin: 10px 150px 0px 150px;
 }
-
 
 /* Navbar.css */
 
@@ -36,11 +37,14 @@
   }
 }
 
+/* Stock Table */
 
 .stock_table {
   padding: 20px;
   min-height: 400px;
 }
+
+/* Search Bar */
 
 .search_bar {
   padding: 20px;
@@ -69,7 +73,6 @@
   border: 1px solid #ccc;
   box-sizing: border-box; 
 }
-
 
 .search_display p {
   margin: 5px 0;
@@ -114,4 +117,5 @@
   .search_display .column {
     flex: 1 1 auto; 
     margin-bottom: 10px; 
+}
 }
