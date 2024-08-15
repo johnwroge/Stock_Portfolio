@@ -7,7 +7,11 @@ import { options } from "../utils/stocks.ts";
 import StockDisplay from "./StockDisplay";
 import getStockPrice from "../hooks/getStockPrice";
 import createStocks from "../hooks/createStocks";
-import { StockInfo, CreateStockResponse, SearchBarProps } from "../types/types.ts"; // Assuming you've put all interfaces in a types.ts file
+import {
+  StockInfo,
+  CreateStockResponse,
+  SearchBarProps,
+} from "../types/types.ts"; // Assuming you've put all interfaces in a types.ts file
 
 const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
   const [symbol, setSymbol] = useState<string>("");
@@ -21,7 +25,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const data = await getStockPrice(symbol); 
+      const data = await getStockPrice(symbol);
       setStockPrice(data.stock_info);
       setError(null);
     } catch (error) {
@@ -164,6 +168,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
             display: "flex",
             justifyContent: "center",
             marginTop: "20px",
+            alignItems: "center",
           }}
         >
           <CircularProgress />
