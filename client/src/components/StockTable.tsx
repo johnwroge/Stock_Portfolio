@@ -54,29 +54,40 @@ const StockTable: React.FC<StockTableProps> = ({
 
   return (
     <div className="stock_table">
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="stock table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Symbol</TableCell>
-              <TableCell>Last Trade Price</TableCell>
-              <TableCell>Number of Shares Owned</TableCell>
-              <TableCell>Market Value of Stake</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {stocks.map((stock) => (
-              <StockRow
-                key={stock.id}
-                stock={stock}
-                onDeleteStock={onDeleteStock}
-                isRising={stock.price > stock.previous_close}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {stocks.length === 0 ? (
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "20px",
+          }}
+        >
+          <p>There are no stocks to display.</p>
+        </div>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="stock table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Symbol</TableCell>
+                <TableCell>Last Trade Price</TableCell>
+                <TableCell>Number of Shares Owned</TableCell>
+                <TableCell>Market Value of Stake</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {stocks.map((stock) => (
+                <StockRow
+                  key={stock.id}
+                  stock={stock}
+                  onDeleteStock={onDeleteStock}
+                  isRising={stock.price > stock.previous_close}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {loading && (
         <div
