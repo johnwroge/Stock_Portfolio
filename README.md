@@ -57,6 +57,12 @@ ALPHA_KEY=PWRN1YWDMX74MVP9
 be initialized and will lead to errors. However, the app can be started with this command 
 after the database is created . 
 
+## Scheduler
+
+
+`celery -A celery worker --loglevel=info`
+
+`celery -A celery beat --loglevel=info`
 
 ## Starting the frontend
 

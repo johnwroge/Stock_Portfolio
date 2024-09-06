@@ -8,11 +8,13 @@ from dotenv import load_dotenv
 from werkzeug.exceptions import BadRequest
 from utils import parse_stock_csv
 from flask_cors import CORS
+from email_utils import send_email
 
 
 
 load_dotenv()
 ALPHA_KEY = os.getenv('ALPHA_KEY')
+user_email = os.getenv('USER_EMAIL')
 app = Flask(__name__)
 CORS(app)
 DATABASE = 'stocks.db'
@@ -95,6 +97,10 @@ def create_or_update_stock(symbol):
         cur = db.execute('SELECT * FROM stocks WHERE symbol = ?', [symbol])
         updated_stock = cur.fetchone()
 
+        email_body = f"Stock '{symbol}' has been updated/created successfully.\n\nDetails:\n{updated_stock}"
+        send_email(f'{user_email}', "Stock Update Notification", email_body)
+
+
         return jsonify({
             'status': 'success',
             'message': message,
@@ -126,8 +132,14 @@ def delete_stock(id):
         if cursor.rowcount == 0:
             return jsonify({'status': 'not found', 'message': 'No stock found with the given ID'}), 404
         db.commit()
+
+        email_body = f"Stock with ID '{id}' has been deleted successfully."
+        send_email(user_email, "Stock Deletion Notification", email_body)
+
         return jsonify({'status': 'success', 'message': f'Stock {id} deleted successfully'}), 200
     
+
+
     except Exception as e:
         db.rollback()
         current_app.logger.error(f"Error deleting stock with ID {id}: {e}")      
