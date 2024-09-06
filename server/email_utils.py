@@ -17,7 +17,7 @@ def send_email(to_address, subject, body, html_body=None):
     msg['To'] = to_address
     msg['Subject'] = subject
 
-    msg.attach(MIMEText(body, 'plain'))
+    msg.attach(MIMEText(body, 'html'))
 
     if html_body:
         msg.attach(MIMEText(html_body, 'html'))

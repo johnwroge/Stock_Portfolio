@@ -3,7 +3,7 @@ import sqlite3
 import requests
 import sys
 import logging
-from flask import Flask, request, jsonify, current_app
+from flask import Flask, request, render_template, jsonify, current_app
 from dotenv import load_dotenv
 from werkzeug.exceptions import BadRequest
 from utils import parse_stock_csv
@@ -163,6 +163,18 @@ def get_stocks():
     except Exception as e:
         app.logger.error(f"Unexpected error in get_stocks: {e}")
         return jsonify({"error": "An unexpected error occurred in get_stocks"}), 500
+
+@app.route('/test-email', methods=['GET'])
+def test_email():
+    subject = "Test Email Subject"
+    to_address = user_email
+    html_content = render_template('email_template.html')  # Assuming 'email_template.html' is your HTML template
+    
+    success = send_email(to_address, subject, html_content)
+    if success:
+        return "Test email sent successfully!", 200
+    else:
+        return "Failed to send test email.", 500
 
 
 
