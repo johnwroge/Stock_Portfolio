@@ -43,10 +43,10 @@ or
 
 `pip install -r requirements.txt`
 
-4. Create an env file in the server directory with this information:
+4. Create a new API key on Alpha Vantage (https://www.alphavantage.co/support/#api-key) Create an env file in the server directory with this information:
 
 ```env
-ALPHA_KEY=PWRN1YWDMX74MVP9
+ALPHA_KEY=AV_API_KEY
 ```
 
 5. The sqlite database needs to be created. Run the server to execute the database initialization. 
@@ -89,14 +89,21 @@ Ensure you have a virtual environment and dependencies for the server by followi
 
 ### Frontend Tests:
 
+Change into the Frontend Directory
+
 `cd client`
 
+Run Unit Tests
 `npm run test`
 
 
 ### Backend Tests
 
+Change Directories:
+
 `cd server`
+
+Run Integration Tests
 
 `pytest`
 
