@@ -1,4 +1,4 @@
-# Instructions to Run Manrico's Stock Portfolio 
+# Instructions to Stock Portfolio 
 
 The backend of the application was built using a RESTful architecture design with Flask, Python, and a SQLite database and the frontend of the application was bootstrapped using Vite for improved velocity in development. Since the user only needs up to 5 stocks at any time, using a more powerful RDBMS was not required. The application works by sending requests to the server where the server either saves data to the database or interacts with the Alpha Vantage API. 
 
