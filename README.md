@@ -1,18 +1,8 @@
-# Instructions to Stock Portfolio 
+# Stock Portfolio 
 
 The backend of the application was built using a RESTful architecture design with Flask, Python, and a SQLite database and the frontend of the application was bootstrapped using Vite for improved velocity in development. Since the user only needs up to 5 stocks at any time, using a more powerful RDBMS was not required. The application works by sending requests to the server where the server either saves data to the database or interacts with the Alpha Vantage API. 
 
-Most of the requirements in the initial readme were met, except for updating. 
-
-- [x] Searching for individual stock quote by symbol
-- [x] Holding up to 5 stock symbols, and number of shares owned (optional)
-- [x] Deleting a symbol from portfolio
-- [x] Seeing portfolio in one view with (Symbol, Last Trade Price, Number of Shares Owned, Market Value of Stake/Holdings)
-- [x] Saving state to the server, so if the browser is closed, the portfolio can be retrieved
-- [ ] Updating portfolio data every 5 seconds (Last Trade Price, Market Value)
-- [x] (Bonus) Green up, Red down arrow if price of stock went up or down since last update
-
-The Alpha Vantage API limits the number of requests that can be made in one day to 25 for the free API key. As a result, making requests every 5 seconds to fetch updated price data was not feasible, however, the premium API key can be purchased and the stock table component can be updated to make requests every 5000 milliseconds to fulfill this requirement. 
+The Alpha Vantage API limits the number of requests that can be made in one day to 25 for the free API key. As a result, making requests every 5 seconds to fetch updated price data is not feasible, however, the premium API key can be purchased and the stock table component can be updated to make requests every 5000 milliseconds to fulfill this requirement. 
 
 
 ## Future Considerations
