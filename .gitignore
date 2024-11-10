@@ -9,7 +9,7 @@ dist/
 .vscode/
 .idea/
 *.log
-package-lock.json
+
 
 # Ignore developer-interview-takehome.md
 developer-interview-takehome.md
