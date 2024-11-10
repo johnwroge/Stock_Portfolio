@@ -43,7 +43,7 @@ jobs:
       - name: Run pytest
         run: |
           cd server
-          pytest --cov=your_backend_package  
+          pytest   
 
   frontend-tests:
     runs-on: ubuntu-latest
