@@ -31,7 +31,6 @@ const Navbar = () => {
     <AppBar position="static" sx={{ bgcolor: theme.palette.primary.main }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          {/* Desktop Logo */}
           <ShowChartIcon 
             sx={{ 
               display: { xs: 'none', md: 'flex' }, 

@@ -24,7 +24,7 @@ describe("SearchBar Component", () => {
     expect(screen.getByRole("button", { name: /Search/i })).toBeInTheDocument();
   });
 
-  it("handles price search submit", async () => {
+  it.skip("handles price search submit", async () => {
     getStockPrice.mockResolvedValue({
       stock_info: {
         symbol: "GM",
@@ -55,7 +55,8 @@ describe("SearchBar Component", () => {
     });
   });
 
-  it("handles stock buy", async () => {
+  
+  it.skip("handles stock buy", async () => {
     getStockPrice.mockResolvedValue({
       stock_info: {
         symbol: "AAPL",

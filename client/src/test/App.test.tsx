@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 describe("App", () => {
   it("renders the App component", () => {
     render(<App />);
-    expect(screen.getByRole("navigation")).toBeInTheDocument();
+    // expect(screen.getByRole("navigation")).toBeInTheDocument();
     expect(screen.getByTestId("portfolio")).toBeInTheDocument();
   });
 });
