@@ -33,10 +33,15 @@ or
 
 `pip install -r requirements.txt`
 
-4. Create a new API key on Alpha Vantage (https://www.alphavantage.co/support/#api-key) Create an env file in the server directory with this information:
+4. Create a new API key on Alpha Vantage (https://www.alphavantage.co/support/#api-key).The SMTP_PASSWORD can be accessed from your account settings. The email should be where you want to received notifications. Create an env file in the server directory with this information:
 
 ```env
-ALPHA_KEY=AV_API_KEY
+ALPHA_KEY = AV_API_KEY
+SMTP_SERVER = smtp.gmail.com
+SMTP_PORT = 587
+SMTP_USER =  <email>
+SMTP_PASSWORD = <password from your email provider>
+USER_EMAIL = <email>
 ```
 
 5. The sqlite database needs to be created. Run the server to execute the database initialization. 
