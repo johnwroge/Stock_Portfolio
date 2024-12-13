@@ -16,7 +16,7 @@ interface Option {
 const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
   const [symbol, setSymbol] = useState<string | null>(null);
   const [stockPrice, setStockPrice] = useState<StockInfo | null>(null);
-  const [quantity, setQuantity] = useState<number | null>(null);
+  const [quantity, setQuantity] = useState<number | null>(0);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   
@@ -44,14 +44,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
       setError((error as Error).message);
     } finally {
       setLoading(false);
-      setQuantity(null);
+      setQuantity(0);
     }
   };
 
   const handleStockBuy = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stockPrice) return;
-
     const { price, symbol, previous_close } = stockPrice;
     const value = parseFloat(price) * quantity;
     const change_qty = parseFloat(quantity.toString());
@@ -155,7 +154,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
               <TextField
                 type="number"
                 label="Optional Qty"
-                value={quantity}
+                value={quantity === 0 ? '' : quantity}
                 InputProps={{
                   inputProps: { min: 0, step: "any" },
                 }}
