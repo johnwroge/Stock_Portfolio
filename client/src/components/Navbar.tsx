@@ -16,7 +16,6 @@ import { Menu as MenuIcon, ShowChart as ShowChartIcon } from '@mui/icons-materia
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const theme = useTheme();
-
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };

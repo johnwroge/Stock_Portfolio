@@ -11,7 +11,6 @@ from flask_cors import CORS
 from email_utils import send_email
 
 
-
 load_dotenv()
 ALPHA_KEY = os.getenv('ALPHA_KEY')
 user_email = os.getenv('USER_EMAIL')
@@ -70,7 +69,6 @@ def get_stock_info(symbol):
         return jsonify({"stock_info": formatted_data}), 200
     except requests.RequestException as e:
         return jsonify({"error in get_stock_info": f"Error fetching stock data: {str(e)}"}), 500
-
 
 @app.route('/v1/stocks/<string:symbol>', methods=['POST'])
 def create_or_update_stock(symbol):
