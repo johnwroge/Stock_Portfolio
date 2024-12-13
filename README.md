@@ -82,7 +82,9 @@ Tests were written with Vitest and React Testing Library for the frontend and Py
 
 Ensure you have a virtual environment and dependencies for the server by following the setup instructions above. Additionally installing dependencies for the frontend are also required.  
 
-### Frontend Tests:
+## Testing
+
+**Frontend Tests:**
 
 Change into the Frontend Directory
 
@@ -92,7 +94,7 @@ Run Unit Tests
 `npm run test`
 
 
-### Backend Tests
+**Backend Tests**
 
 Change Directories:
 
