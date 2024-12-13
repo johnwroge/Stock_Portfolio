@@ -1,33 +1,34 @@
 import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
-import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
 import { Stack, CircularProgress, Alert } from "@mui/material";
 import { options, top_stocks } from "../utils/stocks.ts";
 import StockDisplay from "./StockDisplay";
 import getStockPrice from "../hooks/getStockPrice";
 import createStocks from "../hooks/createStocks";
-import { TopStocks } from "../utils/stocks.ts";
-import {
-  StockInfo,
-  CreateStockResponse,
-  SearchBarProps,
-} from "../types/types.ts";
+
+interface Option {
+  label: string;
+  value: string;
+}
 
 const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
-  const [symbol, setSymbol] = useState<null | string>(null);
+  const [symbol, setSymbol] = useState<string | null>(null);
   const [stockPrice, setStockPrice] = useState<StockInfo | null>(null);
   const [quantity, setQuantity] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [new_options, setOptions] = useState<any>(options);
-
-  const MAX_STOCKS = 5;
+  
+  // Convert top_stocks object to array of options once
+  const stockOptions: Option[] = Object.entries(top_stocks).map(([symbol, name]) => ({
+    label: `${symbol} - ${name}`,
+    value: symbol
+  }));
 
   const handlePriceSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(symbol)
-    debugger;
+
     if (!symbol) {
       setError("Please select a stock symbol before searching.");
       return;
@@ -69,9 +70,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
         stocks.length >= 5 &&
         stocks.findIndex((stock) => stock.symbol === symbol) === -1
       ) {
-        alert(
-          `You can't add more than ${MAX_STOCKS} stocks. Remove a stock and try again!`
-        );
+        alert("You can't add more than 5 stocks. Remove a stock and try again!");
         return;
       }
       const response: CreateStockResponse = await createStocks(symbol, body);
@@ -84,12 +83,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
           (stock) => stock.symbol === symbol
         );
 
-        if (existingStockIndex === -1 && prevStocks.length >= 5) {
-          alert(
-            `You can't add more than ${MAX_STOCKS} stocks. Remove a stock and try again!`
-          );
-          return prevStocks;
-        } else if (existingStockIndex !== -1) {
+        if (existingStockIndex !== -1) {
           const updatedStocks = [...prevStocks];
           updatedStocks[existingStockIndex] = {
             ...updatedStocks[existingStockIndex],
@@ -114,81 +108,49 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
       setError((error as Error).message);
     } finally {
       setLoading(false);
-      setSymbol(null);
     }
   };
-
-  const handleOptions = (e) => {
-    if (e != null) {
-      let stock = e.target.value;
-      console.log(typeof stock);
-
-      const upper_case = stock.toUpperCase();
-      const name_of_company = top_stocks[upper_case];
-      if (name_of_company) {
-        const mock = {
-          label: `${upper_case} - ${name_of_company}`,
-          value: upper_case,
-        };
-        setOptions([mock]);
-      }
-    } else {
-      setOptions([]);
-    }
-  };
-
-  const filterOptions = createFilterOptions({
-    matchFrom: 'start',
-    stringify: (option) => option.symbol,
-  });
-  
 
   return (
-    <div
-      className="search_bar"
-      style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-    >
+    <div className="search_bar" style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
       <form onSubmit={handlePriceSearchSubmit}>
         <Stack direction="row" spacing={2}>
-          {/* this is causing an error */}
-          <Autocomplete<Option, false, false, false>
+          <Autocomplete
             disablePortal
-            id="combo-box-demo"
-            getOptionLabel={(option) => option.title}
-            options={new_options}
-            value={symbol}
+            id="stock-search"
+            options={stockOptions}
+            value={stockOptions.find(opt => opt.value === symbol) || null}
             onChange={(event, newValue) => {
               setSymbol(newValue?.value || null);
             }}
-            onInputChange={(event) => {
-              handleOptions(event);
-            }}
-            sx={{ width: 300 }}
+            getOptionLabel={(option) => option.label}
             renderInput={(params) => (
               <TextField {...params} label="Stock Ticker" />
             )}
+            sx={{ width: 300 }}
+            filterOptions={(options, { inputValue }) => {
+              const input = inputValue.toUpperCase();
+              return options.filter(option => 
+                option.label.toUpperCase().includes(input) ||
+                option.value.includes(input)
+              );
+            }}
           />
-
           <Button type="submit" variant="contained" color="primary">
             Search
           </Button>
         </Stack>
       </form>
+
       {error && (
         <Alert severity="error" onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
+
       {stockPrice && (
         <div>
-          <form
-            onSubmit={handleStockBuy}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-            }}
-          >
+          <form onSubmit={handleStockBuy} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <Stack direction="row" spacing={2}>
               <TextField
                 type="number"
@@ -209,14 +171,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
       )}
 
       {loading ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "20px",
-            alignItems: "center",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", alignItems: "center" }}>
           <CircularProgress />
         </div>
       ) : (
@@ -228,10 +183,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setStocks, stocks }) => {
             low={stockPrice.low}
             volume={stockPrice.volume}
             price={stockPrice.price}
-            isRising={
-              parseFloat(stockPrice.price) >
-              parseFloat(stockPrice.previous_close)
-            }
+            isRising={parseFloat(stockPrice.price) > parseFloat(stockPrice.previous_close)}
             previous={stockPrice.previous_close}
             change={stockPrice.change}
             change_percent={stockPrice.change_percent}
