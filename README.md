@@ -1,15 +1,8 @@
 # Stock Portfolio 
 
-The backend of the application was built using a RESTful architecture design with Flask, Python, and a SQLite database and the frontend of the application was bootstrapped using Vite for improved velocity in development. Since the user only needs up to 5 stocks at any time, using a more powerful RDBMS was not required. The application works by sending requests to the server where the server either saves data to the database or interacts with the Alpha Vantage API. 
+This is a stock tracking project that helps users keep tabs on up to 5 stocks at one time with optional quantities. 
 
-The Alpha Vantage API limits the number of requests that can be made in one day to 25 for the free API key. As a result, making requests every 5 seconds to fetch updated price data is not feasible, however, the premium API key can be purchased and the stock table component can be updated to make requests every 5000 milliseconds to fulfill this requirement. 
-
-
-## Future Considerations
-
-To enhance the application's performance, I plan to redesign it using WebSockets and a Publisher-Subscriber pattern to facilitate real-time communication and enable clients to receive immediate stock updates. We can establish a persistent connection that allows the server to push updates directly to clients by implementing a WebSocket server, which eliminates the need for frequent polling. Adopting the Publisher-Subscriber pattern will enable the server to broadcast stock changes efficiently to all subscribed clients, ensuring that users receive timely information. The client-side application will be updated to handle WebSocket connections, process incoming data in real-time, and dynamically refresh the UI to reflect the latest stock information. This approach will significantly improve the application's responsiveness and user experience by providing instantaneous updates and reducing latency. 
-
-
+The backend of the application was built using a RESTful architecture design with Flask, Python, and a SQLite database and the frontend of the application was bootstrapped using Vite. The application works by sending requests to the server where the server either saves data to the database or interacts with the Alpha Vantage API. 
 
 ## Starting Backend
 
@@ -52,12 +45,7 @@ USER_EMAIL = <email>
 be initialized and will lead to errors. However, the app can be started with this command 
 after the database is created . 
 
-## Scheduler
 
-
-`celery -A celery worker --loglevel=info`
-
-`celery -A celery beat --loglevel=info`
 
 ## Starting the frontend
 
@@ -75,6 +63,11 @@ after the database is created .
 
 4. Visit http://localhost:5173/ to use the application.
 
+
+
+## Future Considerations
+
+To enhance the application's performance, I plan to redesign it using WebSockets and a Publisher-Subscriber pattern to facilitate real-time communication and enable clients to receive immediate stock updates. We can establish a persistent connection that allows the server to push updates directly to clients by implementing a WebSocket server, which eliminates the need for frequent polling. Adopting the Publisher-Subscriber pattern will enable the server to broadcast stock changes efficiently to all subscribed clients, ensuring that users receive timely information. The client-side application will be updated to handle WebSocket connections, process incoming data in real-time, and dynamically refresh the UI to reflect the latest stock information. This approach will significantly improve the application's responsiveness and user experience by providing instantaneous updates and reducing latency. 
 
 ## Testing
 
@@ -103,6 +96,13 @@ Change Directories:
 Run Integration Tests
 
 `pytest`
+
+## Scheduler
+
+
+`celery -A celery worker --loglevel=info`
+
+`celery -A celery beat --loglevel=info`
 
 
 
