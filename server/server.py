@@ -166,7 +166,7 @@ def get_stocks():
 def test_email():
     subject = "Test Email Subject"
     to_address = user_email
-    html_content = render_template('email_template.html')  # Assuming 'email_template.html' is your HTML template
+    html_content = render_template('email_template.html')  
     
     success = send_email(to_address, subject, html_content)
     if success:
