@@ -36,9 +36,17 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run pytest
-        run: pytest
         env:
           PYTHONPATH: ${{ github.workspace }}/server
+          ALPHA_KEY: ${{ secrets.ALPHA_KEY }}
+          SMTP_SERVER: 'smtp.gmail.com'
+          SMTP_PORT: 587
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+        run: |
+          mkdir -p pytest-results
+          pytest --junitxml=pytest-results/junit.xml
 
       - name: Upload test results
         if: always()
